@@ -32,9 +32,7 @@ module.exports = (app) => {
 // Importando o arquivo .marko que contem o HTML da página
                     require('../views/livros/lista/lista.marko'),
 // Informando qual é o tipo da lista
-                    {
-                        livros
-                    }
+                    { livros:livros }
                 ))
 // bloco catch para caso haja algum erro esse erro seja declarado no console
                 .catch(error => console.log(error))
@@ -45,11 +43,11 @@ module.exports = (app) => {
 // declarando qua a resposta da rota vai ser um arquivo .marko
         resp.marko(
 // importando o arquivo .marko
-            require('../views/livros/form/form.marko'
-            ));
+// segundo parametro, arquivo json 
+            require('../views/livros/form/form.marko'), { livro: {}});
     });
 
-// rota para que quando for adicionado novos livros seja redirecionado para (/livros) atualizada
+// rota para adicionar novos livros
     app.post('/livros', function(req, resp) {
 // Iniciado uma instância do objeto @LivroDao com parametro do banco de dados @db
         const livroDao = new LivroDao(db);
@@ -69,7 +67,6 @@ module.exports = (app) => {
     app.delete('/livros/:id', function(req, resp) {
 // constante id onde vai ficar salvo por parametro o id do livro a ser deletado, é feita uma requisição para pegar o parametro id
         const id = req.params.id;
-        console.log(id);
 // Iniciado uma instância do objeto @LivroDao com parametro do banco de dados @db
         const livroDao = new LivroDao(db);
 // Chamado uma função de remoção @remove do objeto @LivroDao como resposta a Promise declarada em @LivroDao com o parametro id do livro
@@ -79,6 +76,40 @@ module.exports = (app) => {
 // bloco catch para caso haja algum erro esse erro seja declarado no console
                 .catch(error => console.log(error));
     });
+
+// rota para o formulario de alterar o livro
+    app.get('/livros/form/:id', function(req, resp) {
+// constante id onde vai ser salvo o id pego via parametro
+        const id = req.params.id;
+// Iniciado uma instância do objeto @LivroDao com parametro do banco de dados @db
+        const livroDao = new LivroDao(db);
+// chamada da função @buscaPorId do @LivroDao para pegar o livro pelo id do livro
+        livroDao.buscaPorId(id)
+// declarando que como resposta da promise deve ser devolvido um arquivo .marki
+                .then(livro => 
+                    resp.marko(
+// importação do arquivo .marko
+                        require('../views/livros/form/form.marko'),
+                        { livro:livro }
+                    )
+                )
+// bloco catch para caso haja algum erro esse erro seja declarado no console
+                .catch(error => console.log(error));
+    });
+
+// rota para alterar os livros
+app.put('/livros', function(req, resp) {
+// Iniciado uma instância do objeto @LivroDao com parametro do banco de dados @db
+            const livroDao = new LivroDao(db);
+// Chamado uma função de atualizar @atualiza do objeto @LivroDao como resposta a Promise declarada em @LivroDao
+// a função @atualiza recebe como parametro o corpo (@body) do formulario de adição
+            livroDao.atualiza(req.body)
+// caso tudo ocorra corretamente a resposta vai ser um redirecionamento para (/livros) atualizada
+// o @redirect redireciona de uma página para outra
+                    .then(resp.redirect('/livros'))
+// bloco catch para caso haja algum erro esse erro seja declarado no console
+                    .catch(error => console.log(error));
+        });
     
 
 }
