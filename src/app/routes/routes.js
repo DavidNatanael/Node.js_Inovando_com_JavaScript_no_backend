@@ -64,7 +64,7 @@ module.exports = (app) => {
 // rota para deletar o livro
 // usado o verbo delete para apagar
 // criado a variavel id para que qualquer coisa depois de (/livros/) seja salvo na variavel criada, ou seja, passar o id do livro para ser deletado
-    app.delete('/livros/:id', function(req, resp) {
+    app.get('/livros/:id', function(req, resp) {
 // constante id onde vai ficar salvo por parametro o id do livro a ser deletado, é feita uma requisição para pegar o parametro id
         const id = req.params.id;
 // Iniciado uma instância do objeto @LivroDao com parametro do banco de dados @db
